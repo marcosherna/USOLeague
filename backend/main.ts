@@ -1,7 +1,10 @@
+import "reflect-metadata";
+
 import StartUp from "./src/startUp";
+import container from "./src/container";
 
-const startUp = new StartUp();
+const application: StartUp = container.resolve(StartUp);
 
-startUp.Init().catch((error) => {
+application.Init().catch((error) => {
   console.error("Error during startup:", error);
 });

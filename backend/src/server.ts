@@ -1,12 +1,14 @@
 import express, { Application } from "express";
+import { singleton, inject } from "tsyringe";
 
 import BaseRouter from "./utils/baseRouter";
 import ApiRoute from "./routers/apiRouter";
 
+@singleton()
 export default class Server {
   protected api: Application;
 
-  constructor(private apiRouter: BaseRouter = new ApiRoute()) {
+  constructor(@inject(ApiRoute) private apiRouter: BaseRouter) {
     this.api = express();
     this.api.use(this.apiRouter.getPath(), this.apiRouter.getRouter());
   }
