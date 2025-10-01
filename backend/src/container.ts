@@ -1,7 +1,8 @@
 import { container } from "tsyringe";
+import { DataSource } from "typeorm";
 
-// Importing container to register dependencies
-// Add any specific registrations if needed, e.g.:
-// container.register<Interface>("InterfaceName", { useClass: ImplementationClass });
+import { AppDataSource } from "./database/data-source";
+
+container.registerInstance(DataSource, AppDataSource);
 
 export default container;

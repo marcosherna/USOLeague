@@ -8,3 +8,4 @@ const application: StartUp = container.resolve(StartUp);
 application.Init().catch((error) => {
   console.error("Error during startup:", error);
 });
+
