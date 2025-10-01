@@ -1,5 +1,6 @@
 import express, { Application } from "express";
 import { singleton, inject } from "tsyringe";
+import cors from "cors";
 
 import BaseRouter from "./utils/baseRouter";
 import ApiRoute from "./routers/apiRouter";
@@ -10,6 +11,9 @@ export default class Server {
 
   constructor(@inject(ApiRoute) private apiRouter: BaseRouter) {
     this.api = express();
+    this.api.use(express.urlencoded({ extended: true }));
+    this.api.use(express.json());
+    this.api.use(cors());
     this.api.use(this.apiRouter.getPath(), this.apiRouter.getRouter());
   }
 

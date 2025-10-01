@@ -7,7 +7,8 @@ import AuthController from "./authController";
 export default class AuthRouter extends BaseRouter {
   constructor(@inject(AuthController) private authController: AuthController) {
     super("/auth");
-    this.router.get("/", this.authController.getAll);
+    // this.router.get("/", this.authController.getAll);
+    this.router.post("/sign-in", this.authController.signIn); // TODO: not fount router
+    this.router.post("/register", this.authController.create);
   }
 }
- 

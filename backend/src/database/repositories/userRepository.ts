@@ -1,7 +1,7 @@
 import { Repository, DataSource } from "typeorm";
 import { inject, injectable } from "tsyringe";
 
-import { User } from "../models/User";
+import { User, userAuthProvider } from "../models/User";
 
 @injectable({ token: Repository<User> })
 export default class UserRepository extends Repository<User> {
@@ -15,5 +15,12 @@ export default class UserRepository extends Repository<User> {
 
   async findById(id: number): Promise<User | null> {
     return this.findOne({ where: { id } });
+  }
+
+  async findByEmailAndProvider(authProvider: userAuthProvider, email: string) {
+    const user = await this.findOne({
+      where: { email, authProvider: authProvider },
+    });
+    return user;
   }
 }

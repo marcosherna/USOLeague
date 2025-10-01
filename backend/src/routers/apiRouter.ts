@@ -9,5 +9,6 @@ export default class ApiRoute extends BaseRouter {
     super("/api");
 
     this.router.use(authRouter.getPath(), authRouter.getRouter());
+    console.log(authRouter.getRouter())
   }
 }
