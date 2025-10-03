@@ -7,24 +7,24 @@ import AuthService from "./authService";
 export default class AuthController {
   constructor(@inject(AuthService) private authService: AuthService) {}
 
-  public getAll = async (req: Request, res: Response): Promise<Response> => {
+  public getAll = async (req: Request, res: Response): Promise<void> => {
     const users = await this.authService.findAll();
-    return res.json(users);
+    res.json(users);
   };
 
-  public create = async (req: Request, res: Response): Promise<Response> => {
+  public create = async (req: Request, res: Response): Promise<void> => {
     const data = req.body;
     const user = await this.authService.create(data);
-    return res.status(201).json(user);
+    res.status(201).json(user);
   };
 
-  public signIn = async (req: Request, res: Response): Promise<Response> => {
+  public signIn = async (req: Request, res: Response): Promise<void> => {
     const { authProvider, email, password } = req.body;
     const usersession = await this.authService.signIn(
       authProvider,
       email,
       password
     );
-    return res.status(200).json(usersession);
+    res.status(200).json(usersession);
   };
 }

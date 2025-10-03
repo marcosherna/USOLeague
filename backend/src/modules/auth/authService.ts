@@ -4,6 +4,10 @@ import { Repository } from "typeorm";
 import UserRepository from "../../database/repositories/userRepository";
 import { User, userAuthProvider } from "../../database/models/User";
 
+import BadRequest from "../../errors/badRequest";
+import NotFound from "../../errors/notFound";
+import Unauthorized from "../../errors/unauthorized";
+
 @injectable()
 export default class AuthService {
   constructor(
@@ -29,23 +33,25 @@ export default class AuthService {
     ];
 
     if (!validateProvider.includes(provider))
-      throw new Error("Invalid provider");
+      // TODO: validate in DTo
+      throw new BadRequest("Invalid provider");
 
     if (provider === "local" && (!password || password.trim() === ""))
-      throw new Error("Password is required for local provider");
+      throw new BadRequest("Password is required for local provider");
 
     const user = await this.userRepository.findByEmailAndProvider(
       provider,
       email
     );
 
-    if (!user) throw new Error("User not found");
+    if (!user) throw new NotFound("User not found");
 
     if (provider === "local") {
       // TODO: validate credentials
       // const isValid = await bcrypt.compare(password!, user.password);
       // if (!isValid) throw new Error("Invalid credentials")
-      if (user.password !== password) throw new Error("Invalid password");
+      if (user.password !== password)
+        throw new Unauthorized("Invalid password");
     }
 
     return user;

@@ -5,6 +5,8 @@ import cors from "cors";
 import BaseRouter from "./utils/baseRouter";
 import ApiRoute from "./routers/apiRouter";
 
+import errorHandler from "./handlers/errorHandler";
+
 @singleton()
 export default class Server {
   protected api: Application;
@@ -15,6 +17,8 @@ export default class Server {
     this.api.use(express.json());
     this.api.use(cors());
     this.api.use(this.apiRouter.getPath(), this.apiRouter.getRouter());
+
+    this.api.use(errorHandler);
   }
 
   public Listen(port: number, host: string): void {
