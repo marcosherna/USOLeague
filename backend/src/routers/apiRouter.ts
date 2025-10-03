@@ -8,7 +8,6 @@ export default class ApiRoute extends BaseRouter {
   constructor(@inject(AuthRouter) authRouter: AuthRouter) {
     super("/api");
 
-    this.router.use(authRouter.getPath(), authRouter.getRouter());
-    console.log(authRouter.getRouter())
+    this.router.use(authRouter.getPath(), authRouter.getRouter()); 
   }
 }
