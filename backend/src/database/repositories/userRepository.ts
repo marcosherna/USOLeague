@@ -23,4 +23,9 @@ export default class UserRepository extends Repository<User> {
     });
     return user;
   }
+
+  async existByEmail(email: string): Promise<boolean> {
+    const count = await this.count({ where: { email } });
+    return count > 0;
+  }
 }

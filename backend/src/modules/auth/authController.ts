@@ -2,6 +2,7 @@ import { inject, injectable } from "tsyringe";
 import { Request, Response } from "express";
 
 import AuthService from "./authService";
+import { RegisterDto } from "./authDto";
 
 @injectable()
 export default class AuthController {
@@ -13,7 +14,7 @@ export default class AuthController {
   };
 
   public create = async (req: Request, res: Response): Promise<void> => {
-    const data = req.body;
+    const data: RegisterDto = req.body;
     const user = await this.authService.create(data);
     res.status(201).json(user);
   };

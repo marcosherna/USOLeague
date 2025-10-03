@@ -1,4 +1,5 @@
 import { inject, injectable } from "tsyringe";
+import { plainToInstance } from "class-transformer";
 import { Repository } from "typeorm";
 
 import UserRepository from "../../database/repositories/userRepository";
@@ -7,6 +8,8 @@ import { User, userAuthProvider } from "../../database/models/User";
 import BadRequest from "../../errors/badRequest";
 import NotFound from "../../errors/notFound";
 import Unauthorized from "../../errors/unauthorized";
+import Conflict from "../../errors/conflict";
+import { RegisterDto } from "./authDto";
 
 @injectable()
 export default class AuthService {
@@ -14,8 +17,23 @@ export default class AuthService {
     @inject(Repository<User>) private userRepository: UserRepository
   ) {}
 
-  async create(user: User): Promise<User> {
-    const newUser = this.userRepository.create(user);
+  async create(user: RegisterDto): Promise<User> {
+    const isExist = await this.userRepository.existByEmail(user.email);
+
+    if (isExist) throw new Conflict("El usuario ya existe");
+
+    if (user.isLocal() && !user.password)
+      throw new BadRequest("La contraseña es requerida para usuarios locales", [
+        { field: "password", errors: ["Is required"] },
+      ]);
+
+    if (!user.isLocal() && !user.providerId)
+      throw new BadRequest(
+        "El providerId es requerido para proveedores externos",
+        [{ field: "providerId", errors: ["Is required"] }]
+      );
+    const objUser = plainToInstance(User, user);
+    const newUser = this.userRepository.create(objUser);
     return await this.userRepository.save(newUser);
   }
 
