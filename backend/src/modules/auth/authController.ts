@@ -2,7 +2,8 @@ import { inject, injectable } from "tsyringe";
 import { Request, Response } from "express";
 
 import AuthService from "./authService";
-import { RegisterDto } from "./authDto";
+import { UserDto, UserRegisterDto, UserSignInDto } from "./authDto";
+import { instanceToPlain } from "class-transformer";
 
 @injectable()
 export default class AuthController {
@@ -10,22 +11,23 @@ export default class AuthController {
 
   public getAll = async (req: Request, res: Response): Promise<void> => {
     const users = await this.authService.findAll();
-    res.json(users);
+    const data = instanceToPlain(users);
+    res.json(data);
   };
 
   public create = async (req: Request, res: Response): Promise<void> => {
-    const data: RegisterDto = req.body;
-    const user = await this.authService.create(data);
+    const data: UserRegisterDto = req.body;
+
+    const userSession: UserDto = await this.authService.create(data);
+    const user = instanceToPlain(userSession);
     res.status(201).json(user);
   };
 
   public signIn = async (req: Request, res: Response): Promise<void> => {
-    const { authProvider, email, password } = req.body;
-    const usersession = await this.authService.signIn(
-      authProvider,
-      email,
-      password
-    );
-    res.status(200).json(usersession);
+    const data: UserSignInDto = req.body;
+    const usersession = await this.authService.signIn(data);
+    const plainData = instanceToPlain(usersession);
+
+    res.status(200).json(plainData);
   };
 }

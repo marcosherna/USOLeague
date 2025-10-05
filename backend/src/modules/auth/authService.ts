@@ -3,13 +3,13 @@ import { plainToInstance } from "class-transformer";
 import { Repository } from "typeorm";
 
 import UserRepository from "../../database/repositories/userRepository";
-import { User, userAuthProvider } from "../../database/models/User";
+import { User } from "../../database/models/User";
 
 import BadRequest from "../../errors/badRequest";
 import NotFound from "../../errors/notFound";
 import Unauthorized from "../../errors/unauthorized";
 import Conflict from "../../errors/conflict";
-import { RegisterDto } from "./authDto";
+import { UserDto, UserRegisterDto, UserSignInDto } from "./authDto";
 
 @injectable()
 export default class AuthService {
@@ -17,7 +17,7 @@ export default class AuthService {
     @inject(Repository<User>) private userRepository: UserRepository
   ) {}
 
-  async create(user: RegisterDto): Promise<User> {
+  async create(user: UserRegisterDto): Promise<UserDto> {
     const isExist = await this.userRepository.existByEmail(user.email);
 
     if (isExist) throw new Conflict("El usuario ya existe");
@@ -32,50 +32,45 @@ export default class AuthService {
         "El providerId es requerido para proveedores externos",
         [{ field: "providerId", errors: ["Is required"] }]
       );
-    const objUser = plainToInstance(User, user);
-    const newUser = this.userRepository.create(objUser);
-    return await this.userRepository.save(newUser);
+
+    const entity = plainToInstance(User, user);
+
+    const newUser = await this.userRepository.save(entity);
+
+    return plainToInstance(UserDto, newUser);
   }
 
-  async signIn(
-    authProvider: string,
-    email: string,
-    password: string | null = null
-  ) {
-    const provider = authProvider as userAuthProvider;
+  async signIn(user: UserSignInDto): Promise<UserDto> {
+    if (user.isLocal() && (!user.password || user.password.trim() === ""))
+      throw new BadRequest("Password is required for local provider", [
+        { field: "password", errors: ["not empty", "required"] },
+      ]);
 
-    const validateProvider: userAuthProvider[] = [
-      "local",
-      "google",
-      "microsoft",
-    ];
-
-    if (!validateProvider.includes(provider))
-      // TODO: validate in DTo
-      throw new BadRequest("Invalid provider");
-
-    if (provider === "local" && (!password || password.trim() === ""))
-      throw new BadRequest("Password is required for local provider");
-
-    const user = await this.userRepository.findByEmailAndProvider(
-      provider,
-      email
+    const userSession = await this.userRepository.findByEmailAndProvider(
+      user.authProvider,
+      user.email
     );
 
-    if (!user) throw new NotFound("User not found");
+    if (!userSession) throw new NotFound("User not found");
 
-    if (provider === "local") {
+    if (!user.isLocal() && (!user.providerId || user.providerId.trim() === ""))
+      throw new BadRequest("Provider id is required for auth provider", [
+        { field: "provider_id", errors: ["Not empty", "Is required"] },
+      ]);
+
+    if (user.isLocal()) {
       // TODO: validate credentials
       // const isValid = await bcrypt.compare(password!, user.password);
       // if (!isValid) throw new Error("Invalid credentials")
-      if (user.password !== password)
+      if (userSession.password !== user.password)
         throw new Unauthorized("Invalid password");
     }
 
-    return user;
+    return plainToInstance(UserDto, userSession);
   }
 
-  async findAll(): Promise<User[]> {
-    return await this.userRepository.find();
+  async findAll(): Promise<UserDto[]> {
+    const users = await this.userRepository.find();
+    return plainToInstance(UserDto, users);
   }
 }
