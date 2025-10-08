@@ -5,3 +5,47 @@ backend/dist/
 backend/package-lock.json
 frontend/package-lock.json
 
+
+#Mobile
+# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
+
+# dependencies
+frontend/mobile/uso-league/node_modules/
+
+# Expo
+frontend/mobile/uso-league/.expo/
+frontend/mobile/uso-league/dist/
+frontend/mobile/uso-league/web-build/
+frontend/mobile/uso-league/expo-env.d.ts
+
+# Native
+frontend/mobile/uso-league/.kotlin/
+frontend/mobile/uso-league/*.orig.*
+frontend/mobile/uso-league/*.jks
+frontend/mobile/uso-league/*.p8
+frontend/mobile/uso-league/*.p12
+frontend/mobile/uso-league/*.key
+frontend/mobile/uso-league/*.mobileprovision
+
+# Metro
+frontend/mobile/uso-league/.metro-health-check*
+
+# debug
+frontend/mobile/uso-league/npm-debug.*
+frontend/mobile/uso-league/yarn-debug.*
+frontend/mobile/uso-league/yarn-error.*
+
+# macOS
+frontend/mobile/uso-league/.DS_Store
+frontend/mobile/uso-league/*.pem
+
+# local env files
+frontend/mobile/uso-league/.env*.local
+
+# typescript
+frontend/mobile/uso-league/*.tsbuildinfo
+
+# generated native folders
+frontend/mobile/uso-league//ios
+frontend/mobile/uso-league//android
+
