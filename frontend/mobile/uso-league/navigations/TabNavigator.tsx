@@ -8,8 +8,9 @@ import TeamsScreen from "../screens/TeamsScreen";
 import CommunityScreen from "../screens/CommunityScreen";
 
 import { useTheme } from "../hooks/useTheme";
+import { TabParamList } from ".";
 
-const Tab = createBottomTabNavigator();
+const Tab = createBottomTabNavigator<TabParamList>();
 
 export default function TabNavigator() {
   const { theme } = useTheme();
