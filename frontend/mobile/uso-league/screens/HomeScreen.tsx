@@ -6,6 +6,10 @@ import { useTheme } from "../hooks/useTheme";
 export default function HomeScreen() {
   const { theme, setMode } = useTheme();
 
+  theme.colors
+  theme.spacing
+  theme.typography
+
   return (
     <View
       style={{
@@ -24,7 +28,7 @@ export default function HomeScreen() {
         {theme.isDark ? "Dark": "light" }
       </Text>
 
-      <XButton title="Dark" onPress={() => setMode("dark")} />
+      <XButton title="Dark" variant="outlined" onPress={() => setMode("dark")} />
       <XButton title="System" onPress={() => setMode("system")} />
       <XButton title="light" onPress={() => setMode("light")} />
     </View>

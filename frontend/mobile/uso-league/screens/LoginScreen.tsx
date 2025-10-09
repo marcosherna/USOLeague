@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, View, Text } from "react-native";
+import { StyleSheet, View, Text, StatusBar } from "react-native";
 import { useVideoPlayer, VideoView } from "expo-video";
 
 import XButton from "../components/XButton";
@@ -23,6 +23,7 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
 
   return (
     <View style={styles.container}>
+ 
       <VideoView
         style={StyleSheet.absoluteFillObject}
         player={player}
