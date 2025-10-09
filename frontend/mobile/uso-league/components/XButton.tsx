@@ -1,98 +1,198 @@
-import { ReactNode } from "react";
-import { Pressable, StyleSheet, Text, ViewStyle } from "react-native";
+import React, { ReactNode, useCallback, useMemo } from "react";
+import {
+  Pressable,
+  Text,
+  ViewStyle,
+  StyleSheet,
+  TextStyle,
+} from "react-native";
 import { useTheme } from "../hooks/useTheme";
+import { Theme } from "../theme";
 
-type ButtonVariant = "contained" | "outlined" | "icon";
-type ButtonCountor = "rounded" | "circular";
+type ButtonVariant = "contained" | "outlined" | "ghost";
+type RoundedButton = "md" | "lg";
+
+const RoundedValues: Record<RoundedButton, number> = {
+  md: 8,
+  lg: 9999,
+};
 
 interface XButtonProps {
   title?: string;
   variant?: ButtonVariant;
   width?: string | number;
+  rounded?: RoundedButton;
   onPress: () => void;
-  icon?: ReactNode;
-  countor?: ButtonCountor;
+  icon?: (color: string, size: number) => ReactNode;
+  disabled?: boolean;
+  loading?: boolean;
+  style?: ViewStyle;
+  textStyle?: TextStyle;
+  accessibilityLabel?: string;
 }
+
+/* --- Helpers para estilo --- */
+
+const generateVariant = (
+  variant: ButtonVariant,
+  rounded: RoundedButton,
+  theme: Theme
+): ViewStyle => {
+  const base: ViewStyle = {
+    backgroundColor: "transparent",
+    borderWidth: 2,
+    borderColor: theme.colors.primary,
+    justifyContent: "center",
+    alignItems: "center",
+    gap: theme.spacing.md,
+    borderRadius: RoundedValues[rounded],
+    padding: theme.spacing.md,
+    flexDirection: "row",
+  };
+
+  switch (variant) {
+    case "contained":
+      return {
+        ...base,
+        backgroundColor: theme.colors.primary,
+        borderWidth: 0,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 3,
+        elevation: 3,
+      };
+    case "outlined":
+      return { ...base, paddingVertical: theme.spacing.md - 2 };
+    case "ghost":
+      return {
+        ...base,
+        borderWidth: 0,
+        backgroundColor: `${theme.colors.primary}33`,
+      };
+    default:
+      return base;
+  }
+};
+
+const generateVariantIcon = (variant: ButtonVariant, theme: Theme) => {
+  const style = {
+    color: theme.colors.primary,
+    size: theme.typography.body.fontSize,
+  };
+
+  if (variant === "contained") {
+    style.color = theme.colors.onPrimary;
+  }
+
+  return style;
+};
+
+const generateStylePress = (
+  pressed: boolean,
+  variant: ButtonVariant,
+  theme: Theme
+): ViewStyle => {
+  if (!pressed) return {};
+  const base: ViewStyle = {
+    transform: [{ scale: 0.98 }],
+  };
+  if (variant === "ghost") {
+    return { ...base, backgroundColor: `${theme.colors.primary}60` };
+  }
+  return { ...base, backgroundColor: `${theme.colors.primary}33` };
+};
+
+/* --- Componente principal --- */
 
 export default function XButton({
   onPress,
   title,
   variant = "contained",
   width = "auto",
-  countor = "rounded",
+  rounded = "md",
   icon,
+  disabled = false,
+  loading = false,
+  style,
+  textStyle,
+  accessibilityLabel,
 }: XButtonProps) {
   const { theme } = useTheme();
-  const isIcon = variant === "icon";
-  const isCircular = countor === "circular";
+
+  // Memoizar estilos base
+  const iconStyle = useMemo(
+    () => generateVariantIcon(variant, theme),
+    [variant, theme]
+  );
+  const baseStyle = useMemo(
+    () => generateVariant(variant, rounded, theme),
+    [variant, rounded, theme]
+  );
+
+  const _icon = icon?.(iconStyle.color, iconStyle.size);
+  const isIconOnly = !!_icon && !title;
+
+  const sizeStyle = useMemo<ViewStyle>(
+    () =>
+      isIconOnly
+        ? {
+            paddingHorizontal: theme.spacing.md,
+            paddingVertical: theme.spacing.md,
+            alignSelf: "flex-start",
+          }
+        : ({ width: width === "auto" ? undefined : width } as ViewStyle),
+    [isIconOnly, width, theme]
+  );
+
+  const textComputedStyle = useMemo<TextStyle>(
+    () => ({
+      color: iconStyle.color,
+      fontSize: theme.typography.body.fontSize,
+      fontWeight: theme.typography.body.fontWeight as TextStyle["fontWeight"],
+      fontFamily: theme.typography.fontFamily,
+      textAlign: "center",
+    }),
+    [
+      iconStyle.color,
+      theme.typography.body.fontSize,
+      theme.typography.body.fontWeight,
+      theme.typography.fontFamily,
+    ]
+  );
+
+  const handlePress = useCallback(() => {
+    if (!disabled && !loading) onPress();
+  }, [onPress, disabled, loading]);
 
   return (
     <Pressable
-      style={({ pressed }) => {
-        // Estilos base según el tipo de botón
-        const baseStyle: ViewStyle = isIcon
-          ? {
-              backgroundColor: "transparent",
-              borderWidth: 2,
-              borderColor: theme.colors.primary,
-            }
-          : variant === "contained"
-          ? {
-              backgroundColor: theme.colors.primary,
-              padding: theme.spacing.md,
-              borderRadius: 8,
-              justifyContent: "center",
-              alignItems: "center",
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.2,
-              shadowRadius: 3,
-              elevation: 3,
-            }
-          : {
-              backgroundColor: "transparent",
-              padding: theme.spacing.md,
-              borderRadius: 8,
-              justifyContent: "center",
-              alignItems: "center",
-              borderWidth: 2,
-              borderColor: theme.colors.primary,
-            };
- 
-        const pressedStyle: ViewStyle = pressed
-          ? isIcon
-            ? { backgroundColor: `${theme.colors.primary}33`, transform: [{ scale: 0.98 }] }
-            : variant === "contained"
-            ? { backgroundColor: theme.colors.onPrimary, transform: [{ scale: 0.98 }] }
-            : { backgroundColor: `${theme.colors.primary}22`, transform: [{ scale: 0.98 }] }
-          : {};
-
-        // Tamaño de icono
-        const sizeStyle = isIcon
-          ? { width: 48, height: 48, padding: 0, borderRadius: isCircular ? 24 : 8 }
-          : { width };
-
-        return { ...baseStyle, ...pressedStyle, ...sizeStyle } as ViewStyle;
-      }}
-      onPress={onPress}
+      accessibilityLabel={accessibilityLabel || title}
+      accessibilityRole="button"
+      disabled={disabled || loading}
+      onPress={handlePress}
+      style={({ pressed }) => [
+        baseStyle,
+        generateStylePress(pressed, variant, theme),
+        sizeStyle,
+        disabled && { opacity: 0.6 },
+        style,
+      ]}
     >
-      {isIcon && icon ? (
-        icon
-      ) : (
-        <Text
-          style={{
-            color:
-              variant === "contained"
-                ? theme.colors.onPrimary
-                : theme.colors.primary,
-            fontSize: theme.typography.body.fontSize,
-            fontWeight: theme.typography.body.fontWeight as any,
-            fontFamily: theme.typography.fontFamily,
-          }}
-        >
-          {title}
+      {_icon}
+      {title && (
+        <Text style={[styles.textBase, textComputedStyle, textStyle]}>
+          {loading ? "..." : title}
         </Text>
       )}
     </Pressable>
   );
 }
+
+/* --- Estilos estáticos --- */
+
+const styles = StyleSheet.create({
+  textBase: {
+    textAlign: "center",
+  },
+});
