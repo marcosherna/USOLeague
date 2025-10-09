@@ -1,9 +1,9 @@
 import { View, Text } from "react-native";
 
-export default function SearchScreen() {
+export default function TeamsScreen() {
   return (
     <View>
-      <Text>this is Search screen</Text>
+      <Text>this is team screen</Text>
     </View>
   );
 }
