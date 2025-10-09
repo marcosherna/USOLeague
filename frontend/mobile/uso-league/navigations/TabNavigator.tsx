@@ -1,11 +1,5 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import {
-  Home,
-  Trophy,
-  User,
-  Coffee, 
-  CirclePlus,
-} from "lucide-react-native";
+import { Home, Trophy, User, Coffee, CirclePlus } from "lucide-react-native";
 
 import HomeScreen from "../screens/HomeScreen";
 import ProfileScreen from "../screens/ProfileScreen";
@@ -13,11 +7,30 @@ import TournamentsScreen from "../screens/TournamentsScreen";
 import TeamsScreen from "../screens/TeamsScreen";
 import CommunityScreen from "../screens/CommunityScreen";
 
+import { useTheme } from "../hooks/useTheme";
+
 const Tab = createBottomTabNavigator();
 
 export default function TabNavigator() {
+  const { theme } = useTheme();
   return (
-    <Tab.Navigator>
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        tabBarActiveTintColor: theme.colors.primary,
+        tabBarInactiveTintColor: theme.colors.secondaryText,
+        tabBarStyle: {
+          backgroundColor: theme.colors.surface,
+          borderTopColor: theme.colors.outline,
+        },
+        headerStyle: {
+          backgroundColor: theme.colors.surface,
+        },
+        headerTintColor: theme.colors.text,
+        headerTitleStyle: {
+          fontWeight: "bold",
+        },
+      })}
+    >
       <Tab.Screen
         name="Home"
         component={HomeScreen}
