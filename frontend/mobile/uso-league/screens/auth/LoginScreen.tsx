@@ -2,8 +2,8 @@ import React from "react";
 import { StyleSheet, View } from "react-native";
 import { useVideoPlayer, VideoView } from "expo-video";
 
-import XButton from "../components/XButton";
-import { LoginScreenProps } from "../navigations";
+import XButton from "../../components/XButton";
+import { LoginScreenProps } from "../../navigations";
 
 export default function LoginScreen({ navigation }: LoginScreenProps) {
   const player = useVideoPlayer(
@@ -16,6 +16,10 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
       player.muted = true;
     }
   );
+
+  const handleGoRegisterScreen = () => {
+    navigation.navigate("register");
+  };
 
   const handleSignIn = () => {
     navigation.navigate("main-app");
@@ -37,14 +41,22 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
         <XButton
           title="Register"
           variant="outlined"
-          onPress={() => handleSignIn()}
+          onPress={() => handleGoRegisterScreen()}
         />
         <XButton title="Sign in" onPress={() => handleSignIn()} />
         <View
           style={{ flexDirection: "row", justifyContent: "center", gap: 10 }}
         >
-          <XButton variant="outlined" title="G" onPress={() => handleSignIn()} /> 
-          <XButton variant="outlined" title="M" onPress={() => handleSignIn()} />
+          <XButton
+            variant="outlined"
+            title="G"
+            onPress={() => handleSignIn()}
+          />
+          <XButton
+            variant="outlined"
+            title="M"
+            onPress={() => handleSignIn()}
+          />
         </View>
       </View>
     </View>

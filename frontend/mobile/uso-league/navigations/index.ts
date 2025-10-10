@@ -3,6 +3,7 @@ import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 export type RootStackParamList = {
   login: undefined;
   "main-app": undefined;
+  register: undefined;
 };
 
 export type TabParamList = {
@@ -20,4 +21,9 @@ export type LoginScreenProps = NativeStackScreenProps<
 export type MainAppScreenProps = NativeStackScreenProps<
   RootStackParamList,
   "main-app"
+>;
+
+export type RegisterScreenProps = NativeStackScreenProps<
+  RootStackParamList,
+  "register"
 >;

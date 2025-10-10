@@ -6,13 +6,15 @@ import {
   Theme as NavigationTheme,
 } from "@react-navigation/native";
 import { StatusBar } from "react-native";
+import { KeyboardProvider } from "react-native-keyboard-controller";
 
-import LoginScreen from "./screens/LoginScreen";
+import LoginScreen from "./screens/auth/LoginScreen";
 import TabNavigator from "./navigations/TabNavigator";
 import { RootStackParamList } from "./navigations";
 
 import { ThemeProvider } from "./providers/themeProvider";
 import { useTheme } from "./hooks/useTheme";
+import RegistrerScreen from "./screens/auth/RegisterScreen";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -44,6 +46,7 @@ function AppContext() {
         <Stack.Navigator screenOptions={{ headerShown: false }}>
           <Stack.Screen name="login" component={LoginScreen} />
           <Stack.Screen name="main-app" component={TabNavigator} />
+          <Stack.Screen name="register" component={RegistrerScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </>
@@ -52,8 +55,10 @@ function AppContext() {
 
 export default function App() {
   return (
-    <ThemeProvider>
-      <AppContext />
-    </ThemeProvider>
+    <KeyboardProvider>
+      <ThemeProvider>
+        <AppContext />
+      </ThemeProvider>
+    </KeyboardProvider>
   );
 }
